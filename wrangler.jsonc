@@ -17,13 +17,5 @@
 	"vars": {
 		// URL of the deployed backend worker (edassure-api), no trailing slash.
 		"API_BASE_URL": "https://edassure-api.sriramkirand.workers.dev"
-	},
-	"d1_databases": [
-		{
-			"binding": "edassure",
-			"database_name": "edassure",
-			"database_id": "6dae76e6-acde-4d2b-809a-737082381521",
-			"remote": true
-		}
-	]
+	}
 }
