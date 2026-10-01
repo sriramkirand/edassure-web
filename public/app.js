@@ -126,6 +126,8 @@
     targetType.addEventListener("change", redraw); judgeType.addEventListener("change", redraw);
 
     const packSel = h("select", { id: "pack" }, packs.map((p) => h("option", { value: p.id }, `${p.name} v${p.version} (${p.cases} cases)`)));
+    const profileSel = h("select", { id: "profile" }, h("option", { value: "" }, "Not sure / all cases"),
+      h("option", { value: "learner" }, "Learner-facing (pupils use it directly)"), h("option", { value: "teacher" }, "Teacher-facing (staff use it)"));
     const areaBox = h("div");
     const drawAreas = () => {
       const p = packs.find((x) => x.id === packSel.value);
@@ -153,7 +155,7 @@
           const areas = [...areaBox.querySelectorAll("input[name=area]:checked")].map((i) => i.value);
           if (!areas.length) throw new Error("Select at least one area");
           const body = {
-            packId: packSel.value, repeats: Number(f.repeats.value) || 1, areas,
+            packId: packSel.value, repeats: Number(f.repeats.value) || 1, areas, profile: profileSel.value || undefined,
             target: cfg("t", targetType.value), judge: judgeType.value ? cfg("j", judgeType.value) : undefined,
             meta: { client: val("client"), tool: val("tool"), intendedUse: val("use"), ageRange: val("age"), assessor: val("assessor"), reviewer: val("reviewer") },
           };
@@ -169,6 +171,8 @@
       h("label", { for: "ttype" }, "How do we reach the tool?"), targetType, targetFields,
       h("div", { class: "notice" }, "Only test systems you are authorised to test. Never send real pupil data. Keys are sent with each request and are not stored by the backend."),
       h("h2", {}, "Test pack"), h("label", { for: "pack" }, "Pack"), packSel,
+      h("label", { for: "profile" }, "What kind of product is it?"), profileSel,
+      h("p", { class: "muted small" }, "Learner-facing tutors are expected to give hints, not final answers, and to avoid human-like wording (DfE standards). Teacher-facing tools are expected to give direct answers. \"All\" runs every case."),
       h("label", {}, "Areas"), areaBox,
       h("label", { for: "repeats" }, "Repeats per case (1-5)"), (f.repeats = h("input", { id: "repeats", type: "number", min: 1, max: 5, value: 3 })),
       h("h2", {}, "Judge model (optional)"), h("p", { class: "muted small" }, "Scores rubric checks. Not calibrated against human marks yet; treat results as advisory."), judgeType, judgeFields,
@@ -264,7 +268,7 @@
     mount(
       h("p", {}, h("a", { href: "#/" }, "← All runs")),
       h("h1", {}, m.tool),
-      h("p", { class: "muted" }, `${m.client} · ${run.packId} v${run.packVersion} · ${run.target.type}${run.target.model ? " / " + run.target.model : run.target.mode ? " / " + run.target.mode : ""} · ${run.repeats} repeat(s) · ${fmtDate(run.createdAt)}`),
+      h("p", { class: "muted" }, `${m.client} · ${run.packId} v${run.packVersion} · ${run.target.type}${run.target.model ? " / " + run.target.model : run.target.mode ? " / " + run.target.mode : ""} · ${run.repeats} repeat(s) · ${m.profile ? m.profile + "-facing" : "all cases"} · ${fmtDate(run.createdAt)}`),
       h("div", { class: "card" }, bar, status, h("div", { style: "margin-top:10px" }, controls)), keyBox, errBoxEl,
       h("h2", {}, "Results"), resultsBox,
       h("h2", {}, "Human review queue"), h("p", { class: "muted small" }, "Sensitive cases and anything the automated checks could not decide. A completed verdict replaces the automated outcome."), reviewBox);
