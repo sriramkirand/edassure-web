@@ -21,3 +21,31 @@ table{border-collapse:collapse;width:100%;font-size:.93rem;display:block;overflo
 .notice{border-left:4px solid var(--warn);background:var(--soft);padding:10px 14px;border-radius:4px;margin:12px 0}.error{border-left-color:var(--fail)}
 pre.box{white-space:pre-wrap;word-break:break-word;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px;margin:6px 0;font:.88rem/1.45 ui-monospace,Menlo,monospace;max-height:260px;overflow:auto}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.right{margin-left:auto}
+
+/* ---- accounts, summary, manual mode ---- */
+.narrow{max-width:460px}
+.hidden{display:none!important}
+.who{color:var(--muted);margin-right:14px;font-size:.9rem}
+nav button.link{margin-left:6px}
+.notice.ok{border-left-color:var(--pass)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:8px 0 16px}
+.tab{padding:8px 14px;text-decoration:none;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1px}
+.tab.active{color:var(--fg);border-bottom-color:var(--brand);font-weight:600}
+.pill{display:inline-block;padding:2px 10px;border:1px solid var(--line);border-radius:99px;font-size:.82rem;color:var(--muted);margin-right:6px}
+.small-btn{padding:4px 10px;font-size:.85rem}
+.actions{white-space:nowrap}.actions button{margin-right:6px}
+code.pw{font:600 1.05rem ui-monospace,Menlo,monospace;background:var(--bg);border:1px solid var(--line);padding:3px 8px;border-radius:6px}
+.spaced{margin-top:10px}
+.choices{display:grid;gap:8px}
+label.choice{display:flex;gap:10px;align-items:flex-start;font-weight:400;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);margin:0}
+label.choice input{margin-top:5px}
+label.filebtn{cursor:pointer;margin:0}
+input[type=file]{display:none}
+.summary{border:1px solid var(--line);border-left-width:8px;border-radius:10px;padding:14px 18px;margin:12px 0;background:var(--soft)}
+.summary ul{margin:6px 0 10px;padding-left:1.2em}
+.summary-head{display:flex;align-items:center;gap:10px;font-size:1.15rem}
+.summary .dot{width:14px;height:14px;border-radius:50%;background:currentColor;display:inline-block}
+.light-green{border-left-color:var(--pass)}.light-green .dot{color:var(--pass)}
+.light-amber{border-left-color:var(--warn)}.light-amber .dot{color:var(--warn)}
+.light-red{border-left-color:var(--fail)}.light-red .dot{color:var(--fail)}
+textarea{min-height:70px}
