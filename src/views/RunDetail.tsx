@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Hero, SectionNav } from "../components/bits";
+import { Ring, toneOf } from "../components/charts";
 import { Icon } from "../components/Icon";
 import { Bar, ErrorNotice, Field, Notice, PageSkeleton, SelectField } from "../components/ui";
 import { api, apiBlob } from "../lib/api";
@@ -62,6 +64,8 @@ export function RunDetail({ id, route }: { id: string; route: Route }) {
   if (run.loading && !r) return <PageSkeleton />;
   if (run.error || !r) return <div className="stack"><a className="crumb" href="#/"><Icon name="back" width={15} height={15} />All checks</a><ErrorNotice error={run.error ?? new Error("Not found")} /></div>;
 
+  const ev = results.data?.evaluation;
+  const overall = ev ? (() => { const pa = ev.areas.reduce((n, x) => n + x.passed, 0), fa = ev.areas.reduce((n, x) => n + x.failed, 0); return pa + fa ? pa / (pa + fa) : null; })() : null;
   const p = progress ?? r.progress, complete = p.pending === 0, pctDone = p.total ? (100 * p.done) / p.total : 0;
   const m = r.meta;
 
@@ -82,22 +86,28 @@ export function RunDetail({ id, route }: { id: string; route: Route }) {
 
   return (
     <div className="stack-lg">
-      <div className="stack">
-        <a className="crumb" href="#/"><Icon name="back" width={15} height={15} />{staff ? "All runs" : "Your checks"}</a>
-        <div className="row spread">
+      <Hero>
+        <div className="hero-grid">
           <div className="stack">
+            <a className="crumb" href="#/"><Icon name="back" width={15} height={15} />{staff ? "All checks" : "Your checks"}</a>
+            <div className="eyebrow">{r.orgName || m.client}</div>
             <h1>{m.tool}</h1>
-            <p className="muted">{r.orgName || m.client} · {r.packId} v{r.packVersion} · {targetText(r.target)} · {r.repeats} repeat(s) · {fmtDate(r.createdAt)}</p>
+            <p className="muted" style={{ margin: 0 }}>{r.packId} v{r.packVersion} · {targetText(r.target)} · {r.repeats} repeat(s) · {fmtDate(r.createdAt)}</p>
+            <div className="row"><span className="pill">{MODE_LABEL[r.mode]}</span><span className="pill">{profileLabel(m.profile)}</span>{r.publishedAt && <span className="pill">Shared with client</span>}</div>
+            {staff && <p className="small muted" style={{ margin: 0, maxWidth: "46em" }}>{r.evidenceSource}</p>}
+            <div className="dl-actions" style={{ marginTop: 6 }}>
+              <button className="btn" onClick={() => void download(`/api/runs/${id}/report?format=html`, "report.html", true)}><Icon name="file" width={16} height={16} />Open report</button>
+              <button className="btn ghost" onClick={() => void download(`/api/runs/${id}/report?format=md`, "report.md", false)}><Icon name="download" width={16} height={16} />Markdown</button>
+              {staff && <button className="btn ghost" onClick={() => void download(`/api/runs/${id}/evidence.jsonl`, "evidence.jsonl", false)}>Evidence</button>}
+            </div>
           </div>
-          <div className="dl-actions">
-            <button className="btn ghost" onClick={() => void download(`/api/runs/${id}/report?format=html`, "report.html", true)}><Icon name="file" width={16} height={16} />Report</button>
-            <button className="btn ghost" onClick={() => void download(`/api/runs/${id}/report?format=md`, "report.md", false)}><Icon name="download" width={16} height={16} />Markdown</button>
-            {staff && <button className="btn ghost" onClick={() => void download(`/api/runs/${id}/evidence.jsonl`, "evidence.jsonl", false)}>Evidence</button>}
+          <div style={{ textAlign: "center" }}>
+            <Ring value={overall} size={150} stroke={12} tone={toneOf(results.data?.summary.light)} glow sub={results.data ? "passed" : undefined} />
+            {results.data && <div style={{ marginTop: 10, fontWeight: 600, maxWidth: 170 }}>{results.data.summary.headline}</div>}
           </div>
         </div>
-        <div className="row"><span className="pill">{MODE_LABEL[r.mode]}</span><span className="pill">{profileLabel(m.profile)}</span>{r.orgName && <span className="pill">{r.orgName}</span>}</div>
-        {staff && <p className="small muted">{r.evidenceSource}</p>}
-      </div>
+      </Hero>
+      <SectionNav items={[{ id: "summary", label: "Summary" }, { id: "areas", label: "Areas" }, ...(results.data?.evaluation.findings.length ? [{ id: "findings", label: "Findings" }] : []), ...(staff ? [{ id: "review", label: "Review" }] : [])]} />
 
       {staff && (
         <section className="card stack">
@@ -120,17 +130,14 @@ export function RunDetail({ id, route }: { id: string; route: Route }) {
       {operate && <SharePanel run={r} onChange={() => run.reload(true)} />}
       {operate && r.mode !== "api" && <ManualPanel run={r} onChange={refreshAll} />}
 
-      <div className="stack">
-        <h2>Results</h2>
-        {results.loading && !results.data ? <PageSkeleton /> : results.error ? <ErrorNotice error={results.error} /> : results.data && <Results ev={results.data.evaluation} summary={results.data.summary} staff={staff} />}
-      </div>
+      {results.loading && !results.data ? <PageSkeleton /> : results.error ? <ErrorNotice error={results.error} /> : results.data && <Results ev={results.data.evaluation} summary={results.data.summary} staff={staff} />}
 
       {staff && (
-        <div className="stack">
+        <section id="review" className="anchor stack">
           <h2>Human review queue</h2>
           <p className="muted small">Sensitive cases and anything the automated checks could not decide. Your verdict is recorded under your name and replaces the automated outcome.</p>
           {review.error ? <ErrorNotice error={review.error} /> : <ReviewQueue runId={id} items={review.data ?? []} onDone={refreshAll} />}
-        </div>
+        </section>
       )}
     </div>
   );

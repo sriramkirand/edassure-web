@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { Ring } from "../components/charts";
 import { ThemeToggle } from "../components/Layout";
 import { Icon } from "../components/Icon";
 import { ErrorNotice, Field, Notice } from "../components/ui";
@@ -10,9 +11,13 @@ function AuthShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="auth page">
       <aside className="auth-art">
-        <div className="row" style={{ position: "relative" }}><span className="logo" style={{ background: "rgba(255,255,255,.18)" }}><svg viewBox="0 0 24 24" style={{ stroke: "currentColor" }}><path d="M5 12.5l4.5 4.5L19 7" /></svg></span><strong style={{ fontFamily: "var(--font-head)", fontSize: "1.2rem" }}>Assurance</strong></div>
+        <div className="brandline"><span className="logo" style={{ background: "rgba(255,255,255,.18)" }}><svg viewBox="0 0 24 24" style={{ stroke: "currentColor" }}><path d="M5 12.5l4.5 4.5L19 7" /></svg></span><strong style={{ fontFamily: "var(--font-head)", fontSize: "1.25rem" }}>Assurance</strong></div>
         <h1>Is this AI tool right for the pupils who will use it?</h1>
         <p>Independent testing of the AI tools used in UK schools and colleges, with a plain-English answer you can take to governors, your data protection lead and your supplier.</p>
+        <div className="preview" aria-hidden="true">
+          <Ring value={0.72} size={72} stroke={7} tone="tone-brand" sub="passed" />
+          <div><div className="t">Acme Homework Helper</div><div className="s">Oakfield Trust · Ages 11–14</div><span className="tag">AMBER · Use with conditions</span></div>
+        </div>
         <ul>
           <li><Icon name="shield" />Tested against the DfE generative AI product safety standards</li>
           <li><Icon name="eye" />Sensitive responses are read by a person, not just a script</li>

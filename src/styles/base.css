@@ -1,8 +1,8 @@
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 15.5px/1.6 var(--font-body); -webkit-font-smoothing: antialiased; transition: background-color .3s var(--ease), color .3s var(--ease); }
-h1, h2, h3 { font-family: var(--font-head); font-weight: 600; letter-spacing: -.01em; line-height: 1.2; margin: 0; }
-h1 { font-size: clamp(1.6rem, 3vw, 2rem); } h2 { font-size: 1.3rem; } h3 { font-size: 1.05rem; }
+body { margin: 0; background: var(--page-glow) no-repeat, var(--bg); background-attachment: fixed, scroll; color: var(--ink); font: 15.5px/1.6 var(--font-body); font-feature-settings: "cv11", "ss01"; -webkit-font-smoothing: antialiased; transition: background-color .3s var(--ease), color .3s var(--ease); }
+h1, h2, h3 { font-family: var(--font-head); font-weight: 560; font-variation-settings: "opsz" 72; letter-spacing: -.015em; line-height: 1.15; margin: 0; }
+h1 { font-size: clamp(1.8rem, 3.4vw, 2.5rem); } h2 { font-size: 1.45rem; } h3 { font-size: 1.1rem; }
 p { margin: 0 0 .8em; }
 a { color: var(--brand); text-underline-offset: 3px; }
 a:hover { color: var(--brand-hover); }

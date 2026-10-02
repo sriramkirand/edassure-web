@@ -4,7 +4,8 @@ The Assurance Console: accounts and roles, checks (direct, manual capture, or im
 decision summary, publishing results to client organisations, and report download. Clients get a read-only view of what has been published to them.
 
 **React 19 + TypeScript**, built with **Vite**, served by a small Worker using Workers static assets. The look is the *Chalk* design: warm paper, deep teal, serif
-headings, with a dark theme (follows the system, or use the toggle).
+headings (Fraunces) with Inter for text, both self-hosted, a gradient hero on the dashboard and each check, traffic-light gauge cards, a radar of results by area,
+and a dark theme (follows the system, or use the toggle).
 
 ```
 index.html            Vite entry

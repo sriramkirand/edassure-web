@@ -11,7 +11,7 @@ export interface Progress { done: number; pending: number; total: number }
 export interface TargetConfig { type: string; model?: string; mode?: string; label?: string; baseUrl?: string }
 export interface RunMeta { client: string; tool: string; assessor: string; reviewer: string; intendedUse: string; ageRange: string; profile?: "learner" | "teacher" | null }
 
-export interface RunListItem { id: string; createdAt: string; packId: string; packVersion: string; mode: Mode; target: TargetConfig; meta: RunMeta; repeats: number; done: number; total: number; orgId: string | null; orgName: string | null; publishedAt: string | null }
+export interface RunListItem { id: string; createdAt: string; packId: string; packVersion: string; mode: Mode; target: TargetConfig; meta: RunMeta; repeats: number; done: number; total: number; orgId: string | null; orgName: string | null; publishedAt: string | null; light: Light | null; passRate: number | null; pendingReviews: number; critical: number }
 export interface Run { id: string; createdAt: string; packId: string; packVersion: string; target: TargetConfig; judge: TargetConfig | null; repeats: number; meta: RunMeta; mode: Mode; orgId: string | null; orgName: string | null; publishedAt: string | null; createdByName: string | null; progress: Progress; evidenceSource: string }
 
 export interface Area { area: string; label: string; passed: number; failed: number; review: number; skipped: number; rate: number | null; minimum: number; criticalFailure: boolean; status: "Pass" | "Conditions" | "Fail" | "Not scored" }

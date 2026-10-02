@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { Avatar } from "../components/bits";
 import { Empty, ErrorNotice, Field, Notice, PageSkeleton, SelectField, Tabs } from "../components/ui";
 import { api } from "../lib/api";
 import { fmtDate, ROLE_LABEL } from "../lib/format";
@@ -62,10 +63,10 @@ function Users() {
       {shown && <TempPassword {...shown} onClose={() => setShown(null)} />}
       <div className="card table-wrap" style={{ padding: 6 }}>
         <table>
-          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Organisation</th><th>Last sign-in</th><th>Status</th><th /></tr></thead>
+          <thead><tr><th>Person</th><th>Role</th><th>Organisation</th><th>Last sign-in</th><th>Status</th><th /></tr></thead>
           <tbody>{users.data?.map((u, i) => (
             <tr key={u.id} style={{ ["--i" as string]: i } as React.CSSProperties}>
-              <td style={{ fontWeight: 600 }}>{u.name}</td><td>{u.email}</td><td>{ROLE_LABEL[u.role]}</td><td>{u.orgName || "—"}</td>
+              <td><div className="person"><Avatar name={u.name} /><div><div style={{ fontWeight: 600 }}>{u.name}</div><div className="sub">{u.email}</div></div></div></td><td><span className={"chip " + (u.role === "admin" ? "a" : u.role === "client" ? "n" : "g")}>{ROLE_LABEL[u.role]}</span></td><td>{u.orgName || "—"}</td>
               <td className="muted">{u.lastLoginAt ? fmtDate(u.lastLoginAt) : "never"}</td>
               <td>{u.disabled ? <span className="chip r">Disabled</span> : u.mustChange ? <span className="chip a">Must change password</span> : <span className="chip g">Active</span>}</td>
               <td className="n" style={{ whiteSpace: "nowrap" }}>
