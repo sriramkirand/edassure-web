@@ -1,29 +1,49 @@
 # edassure-web (Cloudflare Worker: frontend)
 
-The Assurance Console UI: accounts and roles, runs (direct, manual capture, or imported spreadsheet), review of sensitive cases, a plain-English decision summary, publishing results to client organisations, and report download. Clients get a read-only view of what has been published to them.
-Plain HTML/CSS and ES-module JavaScript in `public/` (no build step) served by a small Worker (`src/index.ts`) that:
-- serves `/config.js` containing the backend URL from the `API_BASE_URL` variable, so one build works in every environment;
-- adds security headers (CSP limiting connections to itself and the backend, no framing, no referrer).
+The Assurance Console: accounts and roles, checks (direct, manual capture, or imported spreadsheet), human review of sensitive cases, a plain-English
+decision summary, publishing results to client organisations, and report download. Clients get a read-only view of what has been published to them.
+
+**React 19 + TypeScript**, built with **Vite**, served by a small Worker using Workers static assets. The look is the *Chalk* design: warm paper, deep teal, serif
+headings, with a dark theme (follows the system, or use the toggle).
+
+```
+index.html            Vite entry
+src/
+  main.tsx, App.tsx   entry and role-aware routing (tiny hash router, no extra dependency)
+  lib/                typed API client, session + roles, toasts/confirm dialogs, hooks (count-up, loading), types
+  components/         Layout, Icon, ui (fields, chips, bars, summary card, collapse, skeletons)
+  views/              Auth, RunsList, NewRun, RunDetail (+ run/ManualPanel, Results, ReviewQueue), Admin
+  styles/             tokens (light + dark), base, components, animations
+worker/index.ts       serves /config.js (backend URL from API_BASE_URL) and adds security headers
+public/               favicon, dev config.js
+```
+
+## Design and motion
+- Red / amber / green are reserved for meaning and always shown with an icon and a word; the brand colour never competes with them.
+- Motion is CSS-only and short: page and row entrance, count-up numbers, animated progress with a "running" shimmer, expanding panels, toasts, dialogs, a ring pulse on
+  the decision light. Everything is switched off for visitors who set *reduce motion*. No animation library, so the strict CSP stays strict.
+- Dark theme tokens are in `src/styles/tokens.css`; change brand colour there.
 
 ## Local development
 ```bash
+npm install
 # terminal 1: in the edassure-api repo
 npm run dev                         # http://localhost:8787
-# terminal 2: in this repo
-npm install && npm run dev          # http://localhost:8788
+# terminal 2: here
+npm run dev                         # Vite on http://localhost:8788 (hot reload); public/config.js points at the local API
 ```
-The first time, the console shows a setup screen: enter the API repo's `API_TOKEN` (from `.dev.vars`) as the setup token and create the first administrator. After that, sign in with email and password. Use the demo "mock tool" targets to try it without any external API.
-If the browser shows stale files after edits, hard-reload (Cmd+Shift+R).
+Production-like check (built app through the Worker with the real security headers): `npm run build && npm run preview`.
+The first time, the console shows a setup screen: enter the API's `API_TOKEN` as the setup token and create the first administrator.
 
 ## Deploy
 1. Deploy the backend first and copy its URL.
 2. In `wrangler.jsonc` set `vars.API_BASE_URL` to that URL (no trailing slash).
-3. `npm run deploy`; note the frontend URL (e.g. `https://edassure-web.<you>.workers.dev`).
-4. In the edassure-api repo, in `wrangler.jsonc`, set `vars.ALLOWED_ORIGINS` to the frontend URL and run `npm run deploy` there again.
+3. `npm run build && npx wrangler deploy` (Cloudflare's git-connected build runs `npm run build` for you; `wrangler.jsonc` has the build command).
+4. In the API repo set `ALLOWED_ORIGINS` to this Worker's URL and redeploy it.
 
-Custom domains: add them to each Worker in the Cloudflare dashboard, then update `API_BASE_URL` and `ALLOWED_ORIGINS` to match.
+Build output goes to `dist/` (git-ignored). Build settings for Cloudflare Workers Builds: build command `npm run build`, deploy command `npx wrangler deploy`.
 
 ## Notes
-- The session token is held in `sessionStorage` (gone when the tab closes). Keys for the tool under test are held in memory only, so after a page reload
-  a run that needs a key will ask for it again.
-- Model replies are untrusted: the UI only ever inserts text with `textContent`, never HTML.
+- The session token is in `sessionStorage` (gone when the tab closes). Keys for the tool under test stay in memory only, so a reload on a direct run asks for the key again.
+- Model replies are untrusted. React escapes all text by default and nothing uses `dangerouslySetInnerHTML`.
+- `npm run typecheck` checks both the React app and the Worker.

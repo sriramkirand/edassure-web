@@ -1,0 +1,29 @@
+/* Chalk design tokens. Red / amber / green are reserved for meaning; the brand colour never competes with them. */
+:root {
+  --bg: #f6f1e7; --surface: #ffffff; --surface-2: #fbf8f2; --ink: #1f2b27; --muted: #66736e; --line: #e3dbc9; --line-strong: #d3c9b2;
+  --brand: #1e5c52; --brand-hover: #174a42; --brand-ink: #ffffff; --brand-soft: #e3efea;
+  --green: #1c7a4e; --green-bg: #e2f2e9; --amber: #9a5b00; --amber-bg: #fbebcb; --red: #b3322f; --red-bg: #f8dedc; --neutral-bg: #eee9dd;
+  --art-bg: #1e5c52; --art-ink: #ffffff;
+  --radius: 8px; --radius-lg: 12px; --shadow-1: 0 1px 2px rgba(60, 50, 30, .05); --shadow-2: 0 6px 24px rgba(60, 50, 30, .10);
+  --font-body: "Avenir Next", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-head: Georgia, "Iowan Old Style", "Times New Roman", serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --ease: cubic-bezier(.2, .7, .2, 1); --ease-in-out: cubic-bezier(.65, 0, .35, 1);
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --bg: #0f1412; --surface: #161d1a; --surface-2: #121815; --ink: #e8efeb; --muted: #8fa19a; --line: #26312d; --line-strong: #34443e;
+  --brand: #4fc3a8; --brand-hover: #6dd3ba; --brand-ink: #06201a; --brand-soft: #173029;
+  --green: #5fd39a; --green-bg: #123226; --amber: #f2b64a; --amber-bg: #38290e; --red: #ff8a86; --red-bg: #3b1b1c; --neutral-bg: #1f2925;
+  --shadow-1: none; --shadow-2: 0 10px 30px rgba(0, 0, 0, .4); --art-bg: #14352e; --art-ink: #e8efeb;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1412; --surface: #161d1a; --surface-2: #121815; --ink: #e8efeb; --muted: #8fa19a; --line: #26312d; --line-strong: #34443e;
+    --brand: #4fc3a8; --brand-hover: #6dd3ba; --brand-ink: #06201a; --brand-soft: #173029;
+    --green: #5fd39a; --green-bg: #123226; --amber: #f2b64a; --amber-bg: #38290e; --red: #ff8a86; --red-bg: #3b1b1c; --neutral-bg: #1f2925;
+    --shadow-1: none; --shadow-2: 0 10px 30px rgba(0, 0, 0, .4); --art-bg: #14352e; --art-ink: #e8efeb;
+    color-scheme: dark;
+  }
+}

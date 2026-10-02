@@ -1,0 +1,28 @@
+/* Clean, short, purposeful motion. Everything is disabled for people who ask for reduced motion. */
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pop { from { opacity: 0; transform: scale(.88); } to { opacity: 1; transform: none; } }
+@keyframes slide-in { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
+@keyframes ring { 0% { box-shadow: 0 0 0 0 var(--ring); } 100% { box-shadow: 0 0 0 16px transparent; } }
+@keyframes shimmer { from { background-position: -240px 0; } to { background-position: 240px 0; } }
+@keyframes stripes { from { background-position: 0 0; } to { background-position: 28px 0; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes draw { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
+
+.page { animation: rise .42s var(--ease) both; }
+.stagger > * { animation: rise .45s var(--ease) both; animation-delay: calc(var(--i, 0) * 45ms + 60ms); }
+.enter { animation: rise .4s var(--ease) both; }
+.pop { animation: pop .3s var(--ease) both; }
+.fade { animation: fade .35s ease both; }
+
+.skeleton { border-radius: var(--radius); background: linear-gradient(90deg, var(--neutral-bg) 0%, var(--surface-2) 40%, var(--neutral-bg) 80%); background-size: 480px 100%; animation: shimmer 1.3s linear infinite; }
+
+.collapse { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s var(--ease-in-out); }
+.collapse[data-open="true"] { grid-template-rows: 1fr; }
+.collapse > .collapse-inner { overflow: hidden; min-height: 0; }
+
+.spinner { width: 1em; height: 1em; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; display: inline-block; animation: spin .7s linear infinite; vertical-align: -.15em; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+}

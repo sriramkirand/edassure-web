@@ -1,16 +1,26 @@
 {
   "name": "edassure-web",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev --port 8788",
+    "dev": "vite",
+    "build": "tsc -p tsconfig.app.json --noEmit && vite build",
+    "preview": "wrangler dev --port 8788 --var API_BASE_URL:http://localhost:8787",
     "deploy": "wrangler deploy",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.worker.json --noEmit"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260930.2",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.0.0",
     "typescript": "^5.6.0",
+    "vite": "^8.0.0",
     "wrangler": "^4.0.0"
   }
 }
