@@ -19,6 +19,13 @@ worker/index.ts       serves /config.js (backend URL from API_BASE_URL) and adds
 public/               favicon, dev config.js
 ```
 
+## Landing page
+Visitors who are not signed in see a public landing page at `/` (hero, the problem, how it works, what we test, a sample result, schools vs suppliers,
+independence promise, FAQ, footer). Its **Sign in** buttons go to `#/login`; after signing in the console loads. Signing out returns to the landing page.
+- The "Request a check" button appears only when a contact address is set: set `vars.CONTACT_EMAIL` in `wrangler.jsonc` (empty hides the button).
+- All claims on the page are deliberately modest. Review the copy in `src/views/Landing.tsx` before launch, especially the FAQ and the line about the DfE framework.
+- The sample result on the page is illustrative data, labelled as such.
+
 ## Design and motion
 - Red / amber / green are reserved for meaning and always shown with an icon and a word; the brand colour never competes with them.
 - Motion is CSS-only and short: page and row entrance, count-up numbers, animated progress with a "running" shimmer, expanding panels, toasts, dialogs, a ring pulse on

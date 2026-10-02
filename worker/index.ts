@@ -1,6 +1,7 @@
 interface Env {
   ASSETS: Fetcher;
   API_BASE_URL: string;
+  CONTACT_EMAIL?: string;
 }
 
 export default {
@@ -11,7 +12,7 @@ export default {
     let res: Response;
     if (url.pathname === "/config.js") {
       // Lets the same build talk to local, staging or production backends.
-      res = new Response(`window.EDASSURE_CONFIG = ${JSON.stringify({ apiBase })};`, {
+      res = new Response(`window.EDASSURE_CONFIG = ${JSON.stringify({ apiBase, contactEmail: (env.CONTACT_EMAIL || "").trim() || undefined })};`, {
         headers: { "content-type": "text/javascript; charset=utf-8", "cache-control": "no-store" },
       });
     } else {

@@ -39,7 +39,7 @@ export function LoginView() {
   }
   return (
     <AuthShell>
-      <div className="stack"><h1>Sign in</h1><p className="muted">Use the account your administrator created for you.</p></div>
+      <div className="stack"><a className="crumb" href="#/"><Icon name="back" width={15} height={15} />Back to home</a><h1>Sign in</h1><p className="muted">Use the account your administrator created for you.</p></div>
       <form className="stack" onSubmit={submit}>
         <Field label="Email" type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} />
         <Field label="Password" type="password" autoComplete="current-password" required value={pw} onChange={(e) => setPw(e.target.value)} />

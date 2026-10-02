@@ -9,6 +9,7 @@ import "./styles/tokens.css";
 import "./styles/base.css";
 import "./styles/animations.css";
 import "./styles/components.css";
+import "./styles/landing.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode><FeedbackProvider><SessionProvider><App /></SessionProvider></FeedbackProvider></StrictMode>,

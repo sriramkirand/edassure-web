@@ -18,6 +18,8 @@
 	},
 	"vars": {
 		// URL of the deployed backend worker (edassure-api), no trailing slash.
-		"API_BASE_URL": "https://edassure-api.sriramkirand.workers.dev"
+		"API_BASE_URL": "https://edassure-api.sriramkirand.workers.dev",
+		// Shown as the "Request a check" button on the landing page. Leave empty to hide the button until you have a contact address.
+		"CONTACT_EMAIL": ""
 	}
 }

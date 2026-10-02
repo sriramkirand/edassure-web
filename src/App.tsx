@@ -4,6 +4,7 @@ import { useRoute } from "./lib/router";
 import { useSession } from "./lib/session";
 import { Admin } from "./views/Admin";
 import { ChangePasswordView, LoginView, SetupView } from "./views/Auth";
+import { Landing } from "./views/Landing";
 import { NewRun } from "./views/NewRun";
 import { RunDetail } from "./views/RunDetail";
 import { RunsList } from "./views/RunsList";
@@ -14,7 +15,7 @@ export function App() {
 
   if (state.phase === "loading") return <div className="wrap main"><PageSkeleton /></div>;
   if (state.phase === "setup") return <SetupView />;
-  if (!user) return <LoginView />;
+  if (!user) return route.path === "/login" ? <LoginView /> : route.path === "/" ? <Landing /> : <LoginView />;
 
   const p = route.path;
   let view: React.ReactNode;

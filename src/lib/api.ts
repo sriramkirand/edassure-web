@@ -1,4 +1,4 @@
-declare global { interface Window { EDASSURE_CONFIG?: { apiBase?: string } } }
+declare global { interface Window { EDASSURE_CONFIG?: { apiBase?: string; contactEmail?: string } } }
 const API = (window.EDASSURE_CONFIG?.apiBase ?? "").replace(/\/$/, "");
 
 export class ApiError extends Error {
