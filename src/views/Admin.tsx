@@ -2,18 +2,18 @@ import { useState, type FormEvent } from "react";
 import { Avatar } from "../components/bits";
 import { Empty, ErrorNotice, Field, Notice, PageSkeleton, SelectField, Tabs } from "../components/ui";
 import { api } from "../lib/api";
-import { fmtDate, ROLE_LABEL } from "../lib/format";
+import { fmtDate, ORG_KINDS, ROLE_LABEL } from "../lib/format";
 import { useLoad } from "../lib/hooks";
 import { useUser } from "../lib/session";
 import { useFeedback } from "../lib/toast";
-import type { AdminUser, AuditRow, Org, Role } from "../lib/types";
+import type { AdminUser, AuditRow, Department, Org, Role } from "../lib/types";
 
 export function Admin({ tab }: { tab: string }) {
   return (
     <div className="stack-lg">
       <div className="stack"><h1>Administration</h1><p className="muted">People, client organisations, and a record of what happened.</p></div>
-      <Tabs current={tab} items={[["users", "Users"], ["orgs", "Client organisations"], ["audit", "Activity log"]]} />
-      {tab === "orgs" ? <Orgs /> : tab === "audit" ? <Audit /> : <Users />}
+      <Tabs current={tab} items={[["users", "Users"], ["orgs", "Organisations"], ["departments", "Departments"], ["audit", "Activity log"]]} />
+      {tab === "orgs" ? <Orgs /> : tab === "departments" ? <Departments /> : tab === "audit" ? <Audit /> : <Users />}
     </div>
   );
 }
@@ -104,7 +104,7 @@ function Orgs() {
   if (orgs.loading && !orgs.data) return <PageSkeleton />;
   return (
     <div className="stack-lg">
-      <p className="muted">A client organisation is a school, trust, college, university or supplier. Client users belong to one, and only see results you publish to it.</p>
+      <p className="muted">An organisation is a school, trust, council, NHS body, company, charity or supplier. Client users belong to one, and only see results you publish to it.</p>
       {orgs.data?.length ? (
         <div className="card table-wrap" style={{ padding: 6 }}><table><thead><tr><th>Name</th><th>Type</th><th className="n">Users</th><th className="n">Checks</th></tr></thead>
           <tbody>{orgs.data.map((o, i) => <tr key={o.id} style={{ ["--i" as string]: i } as React.CSSProperties}><td style={{ fontWeight: 600 }}>{o.name}</td><td>{o.kind}</td><td className="n">{o.users}</td><td className="n">{o.runs}</td></tr>)}</tbody></table></div>
@@ -112,7 +112,7 @@ function Orgs() {
       <form className="card stack" onSubmit={add}>
         <h2>Add organisation</h2>
         <div className="grid"><Field label="Name" required value={name} onChange={(e) => setName(e.target.value)} />
-          <SelectField label="Type" value={kind} onChange={(e) => setKind(e.target.value)}>{["school", "trust", "college", "university", "supplier", "other"].map((k) => <option key={k}>{k}</option>)}</SelectField></div>
+          <SelectField label="Type" value={kind} onChange={(e) => setKind(e.target.value)}>{ORG_KINDS.map((k) => <option key={k}>{k}</option>)}</SelectField></div>
         {err ? <ErrorNotice error={err} /> : null}
         <div><button className="btn" type="submit">Add organisation</button></div>
       </form>
@@ -128,6 +128,33 @@ function Audit() {
     <div className="stack"><Notice kind="info">Most recent activity first.</Notice>
       <div className="card table-wrap" style={{ padding: 6 }}><table><thead><tr><th>When</th><th>Who</th><th>What</th><th>Detail</th></tr></thead>
         <tbody>{rows.data?.map((r, i) => <tr key={i}><td className="muted" style={{ whiteSpace: "nowrap" }}>{fmtDate(r.ts)}</td><td>{r.userEmail || "—"}</td><td>{r.action.replace(/_/g, " ")}</td><td className="muted">{r.detail || ""}</td></tr>)}</tbody></table></div>
+    </div>
+  );
+}
+
+function Departments() {
+  const deps = useLoad(() => api<Department[]>("/api/admin/departments"), []);
+  const orgs = useLoad(() => api<Org[]>("/api/admin/orgs"), []);
+  const [name, setName] = useState(""), [orgId, setOrgId] = useState(""), [err, setErr] = useState<unknown>(null);
+  async function add(e: FormEvent) {
+    e.preventDefault(); setErr(null);
+    try { await api("/api/admin/departments", { method: "POST", body: { name, orgId } }); setName(""); await deps.reload(true); } catch (ex) { setErr(ex); }
+  }
+  if (deps.loading && !deps.data) return <PageSkeleton />;
+  return (
+    <div className="stack-lg">
+      <p className="muted">A department is a team inside an organisation, such as HR, Finance, Customer Services, Legal or a school's pastoral team. Each check can be filed under a department so you can see which team uses which AI tool.</p>
+      {deps.data?.length ? (
+        <div className="card table-wrap" style={{ padding: 6 }}><table><thead><tr><th>Department</th><th>Organisation</th><th className="n">Checks</th></tr></thead>
+          <tbody>{deps.data.map((d, i) => <tr key={d.id} style={{ ["--i" as string]: i } as React.CSSProperties}><td style={{ fontWeight: 600 }}>{d.name}</td><td>{d.orgName}</td><td className="n">{d.runs}</td></tr>)}</tbody></table></div>
+      ) : <Empty icon="users" title="No departments yet">Add the first one below. Add organisations first if you have none.</Empty>}
+      <form className="card stack" onSubmit={add}>
+        <h2>Add department</h2>
+        <div className="grid"><Field label="Name" required value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. HR, Customer Services" />
+          <SelectField label="Organisation" required value={orgId} onChange={(e) => setOrgId(e.target.value)}><option value="">(choose)</option>{orgs.data?.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}</SelectField></div>
+        {err ? <ErrorNotice error={err} /> : null}
+        <div><button className="btn" type="submit" disabled={!name.trim() || !orgId}>Add department</button></div>
+      </form>
     </div>
   );
 }

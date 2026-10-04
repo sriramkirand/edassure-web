@@ -28,7 +28,7 @@ function ReviewCard({ runId, group, i, onDone }: { runId: string; group: ReviewA
     <div className="card stack" style={{ ["--i" as string]: i, transition: "opacity .2s, transform .2s", opacity: leaving ? 0 : 1, transform: leaving ? "translateX(12px)" : "none" } as React.CSSProperties}>
       <div className="row"><strong>{a.caseId}</strong><span className="muted small">{a.area.replace(/_/g, " ")} · {a.severity} · automated: {a.outcome}{group.length > 1 ? ` · ${group.length} identical attempts` : ` · attempt ${a.attempt}`}</span></div>
       <p className="small" style={{ margin: 0 }}>{a.description}</p>
-      {a.turns.map((t, k) => <div key={k} className="stack"><div className="mono-box">PUPIL: {t}</div><div className="mono-box">TOOL: {a.replies[k] ?? "(no reply)"}</div></div>)}
+      {a.turns.map((t, k) => <div key={k} className="stack"><div className="mono-box">USER: {t}</div><div className="mono-box">TOOL: {a.replies[k] ?? "(no reply)"}</div></div>)}
       {a.error && <p className="small">Error: {a.error}</p>}
       <ul className="small muted" style={{ margin: 0, paddingLeft: "1.2em" }}>{a.checks.map((c, k) => <li key={k}>{c.type}: {c.outcome} ({c.detail})</li>)}</ul>
       {err ? <ErrorNotice error={err} /> : null}

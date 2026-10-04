@@ -3,7 +3,7 @@ import { Hero, Kpi, FilterChips } from "../components/bits";
 import { Ring, toneOf } from "../components/charts";
 import { Icon } from "../components/Icon";
 import { Empty, ErrorNotice, LightChip, PageSkeleton } from "../components/ui";
-import { fmtDay, MODE_LABEL, profileLabel } from "../lib/format";
+import { clientName, fmtDay, MODE_LABEL, profileLabel, SECTOR_LABEL } from "../lib/format";
 import { useLoad } from "../lib/hooks";
 import { api } from "../lib/api";
 import { canOperate, isStaff, useUser } from "../lib/session";
@@ -40,7 +40,7 @@ export function RunsList() {
           <div>
             <div className="eyebrow">{client ? "Independent AI tool checks" : "Assurance workspace"}</div>
             <h1 className="greeting" style={{ margin: "6px 0 8px" }}>{greeting()}, {first}.</h1>
-            <p style={{ maxWidth: "36em", margin: 0 }}>{client ? "These are the AI tools we have checked for your pupils, with a plain-English answer for each." : "Every check in one place: what needs a person's eyes, what is ready to share, and what is not ready for pupils."}</p>
+            <p style={{ maxWidth: "36em", margin: 0 }}>{client ? "These are the AI tools we have checked for you, with a plain-English answer for each." : "Every check in one place: what needs a person's eyes, what is ready to share, and what is not ready for use."}</p>
             {!client && <div className="hero-stats">
               <div><b>{stats.total}</b><span>checks</span></div><div><b>{stats.review}</b><span>responses to review</span></div><div><b>{stats.shared}</b><span>shared with clients</span></div>
             </div>}
@@ -54,7 +54,7 @@ export function RunsList() {
         : (<>
           <div className="kpis stagger">
             {[
-              <Kpi key="r" icon="alert" label="Not ready for pupils" value={stats.red} tone="red" />,
+              <Kpi key="r" icon="alert" label="Not ready for use" value={stats.red} tone="red" />,
               <Kpi key="a" icon="half" label="Use with conditions" value={stats.amber} tone="amber" />,
               <Kpi key="g" icon="check" label="No major problems" value={stats.green} tone="green" />,
               !client ? <Kpi key="v" icon="eye" label="Awaiting review" value={stats.review} tone="gold" /> : <Kpi key="t" icon="file" label="Checks in total" value={stats.total} />,
@@ -87,7 +87,7 @@ function CheckCard({ r, i, client }: { r: RunListItem; i: number; client: boolea
       <Ring value={r.passRate} size={78} stroke={8} tone={tone} sub="passed" />
       <div className="body">
         <h3 title={r.meta.tool}>{r.meta.tool}</h3>
-        <div className="meta">{r.orgName || r.meta.client} · {profileLabel(r.meta.profile)}</div>
+        <div className="meta">{clientName(r)}{r.departmentName ? " · " + r.departmentName : r.sector ? " · " + SECTOR_LABEL[r.sector] : ""} · {profileLabel(r.meta.profile)}</div>
         <div className="row" style={{ gap: 6 }}>
           {r.light ? <LightChip light={r.light} label={LIGHT_LABEL[r.light]} /> : <span className="chip n">{r.done ? "In progress" : "Not started"}</span>}
           {!client && r.pendingReviews > 0 && <span className="chip a"><Icon name="eye" />{r.pendingReviews} to review</span>}

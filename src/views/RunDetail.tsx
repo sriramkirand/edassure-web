@@ -4,7 +4,7 @@ import { Ring, toneOf } from "../components/charts";
 import { Icon } from "../components/Icon";
 import { Bar, ErrorNotice, Field, Notice, PageSkeleton, SelectField } from "../components/ui";
 import { api, apiBlob } from "../lib/api";
-import { fmtDate, MODE_LABEL, profileLabel, saveBlob, targetText } from "../lib/format";
+import { clientName, fmtDate, MODE_LABEL, profileLabel, SECTOR_LABEL, saveBlob, targetText } from "../lib/format";
 import { useLoad } from "../lib/hooks";
 import { keys } from "../lib/keys";
 import { navigate, replaceRoute, type Route } from "../lib/router";
@@ -90,10 +90,10 @@ export function RunDetail({ id, route }: { id: string; route: Route }) {
         <div className="hero-grid">
           <div className="stack">
             <a className="crumb" href="#/"><Icon name="back" width={15} height={15} />{staff ? "All checks" : "Your checks"}</a>
-            <div className="eyebrow">{r.orgName || m.client}</div>
+            <div className="eyebrow">{clientName(r)}</div>
             <h1>{m.tool}</h1>
             <p className="muted" style={{ margin: 0 }}>{r.packId} v{r.packVersion} · {targetText(r.target)} · {r.repeats} repeat(s) · {fmtDate(r.createdAt)}</p>
-            <div className="row"><span className="pill">{MODE_LABEL[r.mode]}</span><span className="pill">{profileLabel(m.profile)}</span>{r.publishedAt && <span className="pill">Shared with client</span>}</div>
+            <div className="row"><span className="pill">{MODE_LABEL[r.mode]}</span><span className="pill">{profileLabel(m.profile)}</span>{r.sector && <span className="pill">{SECTOR_LABEL[r.sector]}</span>}{r.departmentName && <span className="pill">{r.departmentName}</span>}{r.publishedAt && <span className="pill">Shared with client</span>}</div>
             {staff && <p className="small muted" style={{ margin: 0, maxWidth: "46em" }}>{r.evidenceSource}</p>}
             <div className="dl-actions" style={{ marginTop: 6 }}>
               <button className="btn" onClick={() => void download(`/api/runs/${id}/report?format=html`, "report.html", true)}><Icon name="file" width={16} height={16} />Open report</button>

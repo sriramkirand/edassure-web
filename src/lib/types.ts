@@ -1,18 +1,21 @@
 export type Role = "admin" | "assessor" | "reviewer" | "client";
 export type Mode = "api" | "manual" | "import";
 export type Light = "green" | "amber" | "red";
+export type Audience = "learner" | "teacher" | "public" | "staff" | "vulnerable";
+export type Sector = "education" | "public" | "hr" | "health" | "finance" | "legal" | "customer" | "other";
 
 export interface User { id: string; email: string; name: string; role: Role; orgId: string | null; mustChange: boolean }
 export interface Org { id: string; name: string; kind: string; users?: number; runs?: number; createdAt?: string }
 export interface AdminUser { id: string; email: string; name: string; role: Role; orgId: string | null; orgName: string | null; disabled: boolean; mustChange: boolean; createdAt: string; lastLoginAt: string | null }
+export interface Department { id: string; name: string; orgId: string; orgName: string; runs?: number }
 export interface Pack { id: string; name: string; version: string; description: string; cases: number; areas: string[] }
 export interface Progress { done: number; pending: number; total: number }
 
 export interface TargetConfig { type: string; model?: string; mode?: string; label?: string; baseUrl?: string }
-export interface RunMeta { client: string; tool: string; assessor: string; reviewer: string; intendedUse: string; ageRange: string; profile?: "learner" | "teacher" | null }
+export interface RunMeta { client: string; tool: string; assessor: string; reviewer: string; intendedUse: string; ageRange: string; profile?: Audience | null; affects?: "information" | "decisions" | null }
 
-export interface RunListItem { id: string; createdAt: string; packId: string; packVersion: string; mode: Mode; target: TargetConfig; meta: RunMeta; repeats: number; done: number; total: number; orgId: string | null; orgName: string | null; publishedAt: string | null; light: Light | null; passRate: number | null; pendingReviews: number; critical: number }
-export interface Run { id: string; createdAt: string; packId: string; packVersion: string; target: TargetConfig; judge: TargetConfig | null; repeats: number; meta: RunMeta; mode: Mode; orgId: string | null; orgName: string | null; publishedAt: string | null; createdByName: string | null; progress: Progress; evidenceSource: string }
+export interface RunListItem { id: string; createdAt: string; packId: string; packVersion: string; mode: Mode; target: TargetConfig; meta: RunMeta; repeats: number; done: number; total: number; orgId: string | null; orgName: string | null; publishedAt: string | null; sector: Sector | null; departmentId: string | null; departmentName: string | null; light: Light | null; passRate: number | null; pendingReviews: number; critical: number }
+export interface Run { id: string; createdAt: string; packId: string; packVersion: string; target: TargetConfig; judge: TargetConfig | null; repeats: number; meta: RunMeta; mode: Mode; orgId: string | null; orgName: string | null; publishedAt: string | null; sector: Sector | null; departmentId: string | null; departmentName: string | null; createdByName: string | null; progress: Progress; evidenceSource: string }
 
 export interface Area { area: string; label: string; passed: number; failed: number; review: number; skipped: number; rate: number | null; minimum: number; criticalFailure: boolean; status: "Pass" | "Conditions" | "Fail" | "Not scored" }
 export interface Finding { caseId: string; area: string; severity: "critical" | "high" | "medium" | "low"; description: string; prompt: string; reply: string; reason: string; failedAttempts: number; totalAttempts: number }

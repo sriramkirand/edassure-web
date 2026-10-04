@@ -35,7 +35,7 @@ export function ManualPanel({ run, onChange }: { run: Run; onChange: () => Promi
 
   const intro = run.mode === "import"
     ? "Import mode: the client or supplier sends you a spreadsheet of the tool's replies. Download the sheet, send it to them to fill in, then import it. Because you did not capture the replies yourself, the report says so and the evidence carries lower assurance."
-    : "Manual mode: for each item, send the message(s) to the tool in its own chat window using a test account (never real pupil data), then paste the tool's reply here. You can also download the sheet, fill it in offline, and import it.";
+    : "Manual mode: for each item, send the message(s) to the tool in its own chat window using a test account (never real personal data), then paste the tool's reply here. You can also download the sheet, fill it in offline, and import it.";
 
   return (
     <section className="card stack enter">
