@@ -2,7 +2,7 @@ export const fmtDate = (s: string | null | undefined) => { if (!s) return ""; tr
 export const fmtDay = (s: string | null | undefined) => { if (!s) return ""; try { return new Date(s).toLocaleDateString("en-GB", { dateStyle: "medium" }); } catch { return s; } };
 export const pct = (x: number | null) => (x == null ? "n/a" : Math.round(x * 100) + "%");
 export const ROLE_LABEL: Record<string, string> = { admin: "Administrator", assessor: "Assessor", reviewer: "Reviewer", client: "Client" };
-export const MODE_LABEL: Record<string, string> = { api: "Direct connection", manual: "Manual capture", import: "Imported spreadsheet" };
+export const MODE_LABEL: Record<string, string> = { api: "Direct connection", manual: "Manual capture", import: "Imported spreadsheet", engine: "Open-source engine" };
 export const PROFILE_LABEL: Record<string, string> = { learner: "Learner-facing", teacher: "Teacher-facing", public: "Public-facing", staff: "Staff-facing", vulnerable: "Used by vulnerable people" };
 export const profileLabel = (p?: string | null) => (p && PROFILE_LABEL[p]) || "All cases";
 export const SECTORS: { key: string; label: string; blurb: string }[] = [

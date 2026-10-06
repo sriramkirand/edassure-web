@@ -1,5 +1,5 @@
 export type Role = "admin" | "assessor" | "reviewer" | "client";
-export type Mode = "api" | "manual" | "import";
+export type Mode = "api" | "manual" | "import" | "engine";
 export type Light = "green" | "amber" | "red";
 export type Audience = "learner" | "teacher" | "public" | "staff" | "vulnerable";
 export type Sector = "education" | "public" | "hr" | "health" | "finance" | "legal" | "customer" | "other";
@@ -12,7 +12,7 @@ export interface Pack { id: string; name: string; version: string; description: 
 export interface Progress { done: number; pending: number; total: number }
 
 export interface TargetConfig { type: string; model?: string; mode?: string; label?: string; baseUrl?: string }
-export interface RunMeta { client: string; tool: string; assessor: string; reviewer: string; intendedUse: string; ageRange: string; profile?: Audience | null; affects?: "information" | "decisions" | null }
+export interface RunMeta { client: string; tool: string; assessor: string; reviewer: string; intendedUse: string; ageRange: string; profile?: Audience | null; affects?: "information" | "decisions" | null; engine?: { name: string; version?: string; importedAt: string } | null }
 
 export interface RunListItem { id: string; createdAt: string; packId: string; packVersion: string; mode: Mode; target: TargetConfig; meta: RunMeta; repeats: number; done: number; total: number; orgId: string | null; orgName: string | null; publishedAt: string | null; sector: Sector | null; departmentId: string | null; departmentName: string | null; light: Light | null; passRate: number | null; pendingReviews: number; critical: number }
 export interface Run { id: string; createdAt: string; packId: string; packVersion: string; target: TargetConfig; judge: TargetConfig | null; repeats: number; meta: RunMeta; mode: Mode; orgId: string | null; orgName: string | null; publishedAt: string | null; sector: Sector | null; departmentId: string | null; departmentName: string | null; createdByName: string | null; progress: Progress; evidenceSource: string }
@@ -21,7 +21,11 @@ export interface Area { area: string; label: string; passed: number; failed: num
 export interface Finding { caseId: string; area: string; severity: "critical" | "high" | "medium" | "low"; description: string; prompt: string; reply: string; reason: string; failedAttempts: number; totalAttempts: number }
 export interface Evaluation { outcome: "Pass" | "Pass with conditions" | "Not yet"; provisional: boolean; pendingReviews: number; areas: Area[]; findings: Finding[]; criticalCount: number; flakyCases: string[]; totalAttempts: number; completedAttempts: number }
 export interface Summary { light: Light; headline: string; reasons: string[]; conditions: string[]; reviewBy: string }
-export interface Results { evaluation: Evaluation; summary: Summary; progress: Progress }
+export interface AdversarialItem { id: string; tool: string; category: string; severity: "critical" | "high" | "medium" | "low"; status: "open" | "confirmed" | "dismissed"; detail: string | null; prompt?: string | null; reply?: string | null }
+export interface Adversarial { open: number; confirmed: number; dismissed: number; confirmedCritical: number; categories: string[]; items: AdversarialItem[] }
+export interface Results { evaluation: Evaluation; summary: Summary; adversarial: Adversarial; progress: Progress }
+export interface AdversarialFinding { id: string; tool: string; category: string; severity: "critical" | "high" | "medium" | "low"; prompt: string | null; reply: string | null; detail: string | null; status: "open" | "confirmed" | "dismissed"; reviewer: string | null; notes: string | null; reviewedAt: string | null }
+export interface Artifact { id: string; kind: string; tool: string; toolVersion: string | null; filename: string | null; sha256: string | null; bytes: number | null; createdAt: string }
 
 export interface CheckResult { type: string; outcome: string; detail: string }
 export interface ReviewAttempt { id: number; caseId: string; attempt: number; area: string; severity: string; description: string; turns: string[]; replies: string[]; outcome: string; checks: CheckResult[]; error: string | null; needsHuman: boolean }

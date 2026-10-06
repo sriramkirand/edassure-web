@@ -10,7 +10,9 @@ import { keys } from "../lib/keys";
 import { navigate, replaceRoute, type Route } from "../lib/router";
 import { canOperate, isStaff, useUser } from "../lib/session";
 import { useFeedback } from "../lib/toast";
-import type { Org, Progress, Results as ResultsT, ReviewAttempt, Run } from "../lib/types";
+import type { AdversarialFinding, Org, Progress, Results as ResultsT, ReviewAttempt, Run } from "../lib/types";
+import { EnginePanel } from "./run/EnginePanel";
+import { FindingsPanel } from "./run/FindingsPanel";
 import { ManualPanel } from "./run/ManualPanel";
 import { Results } from "./run/Results";
 import { ReviewQueue } from "./run/ReviewQueue";
@@ -22,6 +24,7 @@ export function RunDetail({ id, route }: { id: string; route: Route }) {
   const run = useLoad(() => api<Run>("/api/runs/" + id), [id]);
   const results = useLoad(() => api<ResultsT>(`/api/runs/${id}/results`), [id]);
   const review = useLoad(() => (staff ? api<ReviewAttempt[]>(`/api/runs/${id}/attempts?needs_review=1`) : Promise.resolve([])), [id]);
+  const findings = useLoad(() => (staff ? api<AdversarialFinding[]>(`/api/runs/${id}/findings`) : Promise.resolve([])), [id]);
   const [progress, setProgress] = useState<Progress | null>(null);
   const [running, setRunning] = useState(false), [driveError, setDriveError] = useState<unknown>(null);
   const [keyTick, setKeyTick] = useState(0);
@@ -29,7 +32,7 @@ export function RunDetail({ id, route }: { id: string; route: Route }) {
 
   useEffect(() => { if (run.data) setProgress(run.data.progress); }, [run.data]);
   const refreshAll = useCallback(async () => {
-    await Promise.all([results.reload(true), review.reload(true), run.reload(true)]);
+    await Promise.all([results.reload(true), review.reload(true), run.reload(true), findings.reload(true)]);
   }, [results, review, run]);
 
   const r = run.data;
@@ -107,7 +110,7 @@ export function RunDetail({ id, route }: { id: string; route: Route }) {
           </div>
         </div>
       </Hero>
-      <SectionNav items={[{ id: "summary", label: "Summary" }, { id: "areas", label: "Areas" }, ...(results.data?.evaluation.findings.length ? [{ id: "findings", label: "Findings" }] : []), ...(staff ? [{ id: "review", label: "Review" }] : [])]} />
+      <SectionNav items={[{ id: "summary", label: "Summary" }, { id: "areas", label: "Areas" }, ...(results.data?.evaluation.findings.length ? [{ id: "findings", label: "Findings" }] : []), ...(staff && findings.data?.length ? [{ id: "adversarial", label: "Adversarial" }] : []), ...(staff ? [{ id: "review", label: "Review" }] : [])]} />
 
       {staff && (
         <section className="card stack">
@@ -128,9 +131,18 @@ export function RunDetail({ id, route }: { id: string; route: Route }) {
       {needsKey && operate && <KeyPrompt runId={id} judge={r.judge} onSet={() => setKeyTick((t) => t + 1)} />}
       {driveError ? <ErrorNotice error={driveError} /> : null}
       {operate && <SharePanel run={r} onChange={() => run.reload(true)} />}
-      {operate && r.mode !== "api" && <ManualPanel run={r} onChange={refreshAll} />}
+      {operate && (r.mode === "manual" || r.mode === "import") && <ManualPanel run={r} onChange={refreshAll} />}
+      {operate && r.mode === "engine" && <EnginePanel run={r} pending={p.pending} onRefresh={refreshAll} />}
 
-      {results.loading && !results.data ? <PageSkeleton /> : results.error ? <ErrorNotice error={results.error} /> : results.data && <Results ev={results.data.evaluation} summary={results.data.summary} staff={staff} />}
+      {results.loading && !results.data ? <PageSkeleton /> : results.error ? <ErrorNotice error={results.error} /> : results.data && <Results ev={results.data.evaluation} summary={results.data.summary} adversarial={results.data.adversarial} staff={staff} />}
+
+      {staff && (findings.data?.length ?? 0) > 0 && (
+        <section id="adversarial" className="anchor stack">
+          <h2>Adversarial findings</h2>
+          <p className="muted small">Candidate problems from attack-testing engines. Confirm real problems and dismiss false alarms; nothing counts until a person decides.</p>
+          <FindingsPanel runId={id} items={findings.data ?? []} onDone={refreshAll} />
+        </section>
+      )}
 
       {staff && (
         <section id="review" className="anchor stack">

@@ -3,11 +3,11 @@ import { Radar, toneOf } from "../../components/charts";
 import { Icon } from "../../components/Icon";
 import { Collapse, CountUp, Empty, StatusChip, SummaryCard, Bar } from "../../components/ui";
 import { pct } from "../../lib/format";
-import type { Area, Evaluation, Finding, Summary } from "../../lib/types";
+import type { Adversarial, Area, Evaluation, Finding, Summary } from "../../lib/types";
 
 const areaTone = (s: Area["status"]) => (s === "Pass" ? "tone-green" : s === "Conditions" ? "tone-amber" : s === "Fail" ? "tone-red" : "tone-none");
 
-export function Results({ ev, summary, staff }: { ev: Evaluation; summary: Summary; staff: boolean }) {
+export function Results({ ev, summary, adversarial, staff }: { ev: Evaluation; summary: Summary; adversarial?: Adversarial; staff: boolean }) {
   if (!ev.areas.length) return <Empty icon="shield" title="No results yet">Results appear here as tests are completed.</Empty>;
   return (
     <div className="stack-lg">
@@ -37,6 +37,20 @@ export function Results({ ev, summary, staff }: { ev: Evaluation; summary: Summa
           </div>
         </div>
       </section>
+
+      {adversarial && (adversarial.confirmed > 0 || (staff && adversarial.open > 0)) && (
+        <section className="stack">
+          <h2>Automated adversarial testing</h2>
+          <p className="muted small">Open-source attack-testing engines tried to make the tool misbehave. Findings count only after a person confirms them.</p>
+          <div className="kpis">
+            <div className="card"><div className="eyebrow">Confirmed problems</div><div style={{ font: "560 2.3rem/1.1 var(--font-head)", margin: "4px 0 2px" }}><CountUp value={adversarial.confirmed} /></div><div className="small muted">{adversarial.confirmedCritical} critical</div></div>
+            {staff && <div className="card"><div className="eyebrow">Awaiting review</div><div style={{ font: "560 2.3rem/1.1 var(--font-head)", margin: "4px 0 2px" }}><CountUp value={adversarial.open} /></div><div className="small muted">candidate findings</div></div>}
+          </div>
+          {adversarial.items.filter((x) => x.status === "confirmed").map((x) => (
+            <div key={x.id} className={"card finding " + x.severity}><div className="row"><strong>{x.category}</strong><span className={"chip " + (x.severity === "critical" || x.severity === "high" ? "r" : "a")}>{x.severity}</span><span className="muted small">{x.tool}</span></div>{x.detail && <p className="small" style={{ margin: "8px 0 0" }}>{x.detail}</p>}</div>
+          ))}
+        </section>
+      )}
 
       {ev.findings.length > 0 && (
         <section id="findings" className="anchor stack">

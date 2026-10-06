@@ -14,6 +14,7 @@ const MODES: [Mode, string, string][] = [
   ["api", "Direct connection", "We send the tests straight to the tool using a test key or test endpoint the supplier gives us."],
   ["manual", "Manual capture", "The tool has no API. We paste each test message into its chat window and paste the reply back."],
   ["import", "Imported spreadsheet", "The client or supplier fills in a spreadsheet of the tool's replies. Lower assurance, because we did not capture them."],
+  ["engine", "Open-source engine (on your computer)", "Run Promptfoo on your own computer against the tool, including attack testing. Transcripts come back here to be scored and reviewed."],
 ];
 const blank = { base: "https://api.openai.com/v1", model: "", key: "", system: "", url: "", tpl: '{"query": "{{message}}", "history": "{{history}}"}', path: "" };
 
@@ -53,7 +54,7 @@ function Form({ packs, orgs, departments }: { packs: Pack[]; orgs: Org[]; depart
     setProfile("");
   }, [sector]); // eslint-disable-line react-hooks/exhaustive-deps
   const deptOptions = departments.filter((d) => !orgId || d.orgId === orgId);
-  const pickMode = (m: Mode) => { setMode(m); setRepeats(m === "api" ? 3 : 1); };
+  const pickMode = (m: Mode) => { setMode(m); setRepeats(m === "api" || m === "engine" ? 3 : 1); };
   const tset = (k: keyof typeof blank) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setT({ ...t, [k]: e.target.value });
   const jset = (k: keyof typeof blank) => (e: React.ChangeEvent<HTMLInputElement>) => setJ({ ...j, [k]: e.target.value });
 
