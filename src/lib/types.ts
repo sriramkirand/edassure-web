@@ -44,3 +44,8 @@ export interface VerifyResult {
   issuedAt: string; validUntil: string; reviewBy: string; signedBy: { name: string; role: string }[];
   declarations: Pick<Declarations, "payer" | "feeBasis" | "rightOfReply"> & { priorWork: string }; contentHash: string; revokedReason: string | null;
 }
+export interface NoteView {
+  caseId: string; remediation: string | null; remediationBy: string | null; remediationAt: string | null;
+  reply: { response: "agrees" | "disagrees" | "will_fix" | "already_fixed" | null; respondent: string | null; text: string | null; recordedBy: string | null; recordedAt: string | null } | null;
+}
+export interface NotesResponse { locked: boolean; notes: NoteView[]; suggestions: Record<string, string> }

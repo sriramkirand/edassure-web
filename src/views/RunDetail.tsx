@@ -10,10 +10,11 @@ import { keys } from "../lib/keys";
 import { navigate, replaceRoute, type Route } from "../lib/router";
 import { canOperate, isStaff, useUser } from "../lib/session";
 import { useFeedback } from "../lib/toast";
-import type { AdversarialFinding, Org, Progress, Results as ResultsT, ReviewAttempt, Run } from "../lib/types";
+import type { AdversarialFinding, NotesResponse, Org, Progress, Results as ResultsT, ReviewAttempt, Run } from "../lib/types";
 import { EnginePanel } from "./run/EnginePanel";
 import { FindingsPanel } from "./run/FindingsPanel";
 import { ManualPanel } from "./run/ManualPanel";
+import { NotesPanel } from "./run/NotesPanel";
 import { Results } from "./run/Results";
 import { ReviewQueue } from "./run/ReviewQueue";
 import { StatementPanel } from "./run/StatementPanel";
@@ -26,6 +27,7 @@ export function RunDetail({ id, route }: { id: string; route: Route }) {
   const results = useLoad(() => api<ResultsT>(`/api/runs/${id}/results`), [id]);
   const review = useLoad(() => (staff ? api<ReviewAttempt[]>(`/api/runs/${id}/attempts?needs_review=1`) : Promise.resolve([])), [id]);
   const findings = useLoad(() => (staff ? api<AdversarialFinding[]>(`/api/runs/${id}/findings`) : Promise.resolve([])), [id]);
+  const notes = useLoad(() => (staff ? api<NotesResponse>(`/api/runs/${id}/notes`) : Promise.resolve(null)), [id]);
   const [progress, setProgress] = useState<Progress | null>(null);
   const [running, setRunning] = useState(false), [driveError, setDriveError] = useState<unknown>(null);
   const [keyTick, setKeyTick] = useState(0);
@@ -33,7 +35,7 @@ export function RunDetail({ id, route }: { id: string; route: Route }) {
 
   useEffect(() => { if (run.data) setProgress(run.data.progress); }, [run.data]);
   const refreshAll = useCallback(async () => {
-    await Promise.all([results.reload(true), review.reload(true), run.reload(true), findings.reload(true)]);
+    await Promise.all([results.reload(true), review.reload(true), run.reload(true), findings.reload(true), notes.reload(true)]);
   }, [results, review, run]);
 
   const r = run.data;
@@ -117,7 +119,7 @@ export function RunDetail({ id, route }: { id: string; route: Route }) {
           </div>
         </div>
       </Hero>
-      <SectionNav items={[{ id: "summary", label: "Summary" }, { id: "areas", label: "Areas" }, ...(results.data?.evaluation.findings.length ? [{ id: "findings", label: "Findings" }] : []), ...(staff && findings.data?.length ? [{ id: "adversarial", label: "Adversarial" }] : []), ...(staff ? [{ id: "review", label: "Review" }] : []), ...(operate ? [{ id: "signoff", label: "Sign-off" }] : [])]} />
+      <SectionNav items={[{ id: "summary", label: "Summary" }, { id: "areas", label: "Areas" }, ...(results.data?.evaluation.findings.length ? [{ id: "findings", label: "Findings" }] : []), ...(staff && findings.data?.length ? [{ id: "adversarial", label: "Adversarial" }] : []), ...(staff ? [{ id: "review", label: "Review" }] : []), ...(staff && ev?.findings.length ? [{ id: "fixes", label: "Fixes & replies" }] : []), ...(operate ? [{ id: "signoff", label: "Sign-off" }] : [])]} />
 
       {staff && (
         <section className="card stack">
@@ -138,7 +140,7 @@ export function RunDetail({ id, route }: { id: string; route: Route }) {
       {needsKey && operate && <KeyPrompt runId={id} judge={r.judge} onSet={() => setKeyTick((t) => t + 1)} />}
       {driveError ? <ErrorNotice error={driveError} /> : null}
       {operate && <SharePanel run={r} onChange={() => run.reload(true)} />}
-      <StatementPanel runId={id} blockers={blockers} onChange={() => run.reload(true)} />
+      <StatementPanel runId={id} blockers={blockers} onChange={refreshAll} />
       {operate && (r.mode === "manual" || r.mode === "import") && <ManualPanel run={r} onChange={refreshAll} />}
       {operate && r.mode === "engine" && <EnginePanel run={r} pending={p.pending} onRefresh={refreshAll} />}
 
@@ -149,6 +151,13 @@ export function RunDetail({ id, route }: { id: string; route: Route }) {
           <h2>Adversarial findings</h2>
           <p className="muted small">Candidate problems from attack-testing engines. Confirm real problems and dismiss false alarms; nothing counts until a person decides.</p>
           <FindingsPanel runId={id} items={findings.data ?? []} onDone={refreshAll} />
+        </section>
+      )}
+
+      {staff && notes.data && ev && ev.findings.length > 0 && (
+        <section id="fixes" className="anchor stack">
+          <h2>Fixes and supplier responses</h2>
+          <NotesPanel runId={id} findings={ev.findings} data={notes.data} canEdit={operate} onSaved={refreshAll} />
         </section>
       )}
 
