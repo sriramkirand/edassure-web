@@ -1,5 +1,5 @@
-export const fmtDate = (s: string | null | undefined) => { if (!s) return ""; try { return new Date(s).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }); } catch { return s; } };
-export const fmtDay = (s: string | null | undefined) => { if (!s) return ""; try { return new Date(s).toLocaleDateString("en-GB", { dateStyle: "medium" }); } catch { return s; } };
+export const fmtDate = (s: string | null | undefined) => { if (!s) return ""; try { return new Date(s).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/London" }); } catch { return s; } };
+export const fmtDay = (s: string | null | undefined) => { if (!s) return ""; try { return new Date(s).toLocaleDateString("en-GB", { dateStyle: "medium", timeZone: "Europe/London" }); } catch { return s; } };
 export const pct = (x: number | null) => (x == null ? "n/a" : Math.round(x * 100) + "%");
 export const ROLE_LABEL: Record<string, string> = { admin: "Administrator", assessor: "Assessor", reviewer: "Reviewer", client: "Client" };
 export const MODE_LABEL: Record<string, string> = { api: "Direct connection", manual: "Manual capture", import: "Imported spreadsheet", engine: "Open-source engine" };
