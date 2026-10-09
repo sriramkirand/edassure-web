@@ -16,6 +16,7 @@ import { FindingsPanel } from "./run/FindingsPanel";
 import { ManualPanel } from "./run/ManualPanel";
 import { Results } from "./run/Results";
 import { ReviewQueue } from "./run/ReviewQueue";
+import { StatementPanel } from "./run/StatementPanel";
 
 export function RunDetail({ id, route }: { id: string; route: Route }) {
   const user = useUser();
@@ -71,6 +72,12 @@ export function RunDetail({ id, route }: { id: string; route: Route }) {
   const overall = ev ? (() => { const pa = ev.areas.reduce((n, x) => n + x.passed, 0), fa = ev.areas.reduce((n, x) => n + x.failed, 0); return pa + fa ? pa / (pa + fa) : null; })() : null;
   const p = progress ?? r.progress, complete = p.pending === 0, pctDone = p.total ? (100 * p.done) / p.total : 0;
   const m = r.meta;
+  const blockers = [
+    ...(p.pending > 0 ? [`${p.pending} test(s) have not run yet.`] : []),
+    ...(ev && ev.pendingReviews > 0 ? [`${ev.pendingReviews} attempt(s) still need a human verdict.`] : []),
+    ...(results.data && results.data.adversarial.open > 0 ? [`${results.data.adversarial.open} adversarial finding(s) still need to be confirmed or dismissed.`] : []),
+    ...(p.total === 0 ? ["There are no results to sign."] : []),
+  ];
 
   async function download(path: string, name: string, open: boolean) {
     try {
@@ -110,7 +117,7 @@ export function RunDetail({ id, route }: { id: string; route: Route }) {
           </div>
         </div>
       </Hero>
-      <SectionNav items={[{ id: "summary", label: "Summary" }, { id: "areas", label: "Areas" }, ...(results.data?.evaluation.findings.length ? [{ id: "findings", label: "Findings" }] : []), ...(staff && findings.data?.length ? [{ id: "adversarial", label: "Adversarial" }] : []), ...(staff ? [{ id: "review", label: "Review" }] : [])]} />
+      <SectionNav items={[{ id: "summary", label: "Summary" }, { id: "areas", label: "Areas" }, ...(results.data?.evaluation.findings.length ? [{ id: "findings", label: "Findings" }] : []), ...(staff && findings.data?.length ? [{ id: "adversarial", label: "Adversarial" }] : []), ...(staff ? [{ id: "review", label: "Review" }] : []), ...(operate ? [{ id: "signoff", label: "Sign-off" }] : [])]} />
 
       {staff && (
         <section className="card stack">
@@ -131,6 +138,7 @@ export function RunDetail({ id, route }: { id: string; route: Route }) {
       {needsKey && operate && <KeyPrompt runId={id} judge={r.judge} onSet={() => setKeyTick((t) => t + 1)} />}
       {driveError ? <ErrorNotice error={driveError} /> : null}
       {operate && <SharePanel run={r} onChange={() => run.reload(true)} />}
+      <StatementPanel runId={id} blockers={blockers} onChange={() => run.reload(true)} />
       {operate && (r.mode === "manual" || r.mode === "import") && <ManualPanel run={r} onChange={refreshAll} />}
       {operate && r.mode === "engine" && <EnginePanel run={r} pending={p.pending} onRefresh={refreshAll} />}
 

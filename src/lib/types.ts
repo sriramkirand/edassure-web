@@ -31,3 +31,16 @@ export interface CheckResult { type: string; outcome: string; detail: string }
 export interface ReviewAttempt { id: number; caseId: string; attempt: number; area: string; severity: string; description: string; turns: string[]; replies: string[]; outcome: string; checks: CheckResult[]; error: string | null; needsHuman: boolean }
 export interface ManualItem { attemptId: number; caseId: string; attempt: number; area: string; severity: string; description: string; turns: string[] }
 export interface AuditRow { ts: string; userEmail: string | null; action: string; runId: string | null; detail: string | null }
+
+export interface Declarations { payer: "client" | "supplier" | "other"; feeBasis: "fixed" | "other"; priorWork: string; rightOfReply: "offered" | "declined" | "not_offered"; showClient: boolean }
+export interface StatementInfo {
+  id: string; status: "awaiting" | "issued"; code: string | null; verifyUrl: string | null; preparedBy: string; preparedAt: string;
+  reviewerId: string; reviewer: string; issuedAt: string | null; validUntil: string; contentHash: string | null; declarations: Declarations | null;
+}
+export type VerifyState = "valid" | "expired" | "superseded" | "revoked" | "evidence_changed";
+export interface VerifyResult {
+  state: VerifyState; tool: string; client: string | null; sector: string | null; outcome: string; light: Light; headline: string;
+  areas: { label: string; status: Area["status"] }[]; pack: { name: string; version: string; ratified: boolean }; evidenceMode: string; attempts: number;
+  issuedAt: string; validUntil: string; reviewBy: string; signedBy: { name: string; role: string }[];
+  declarations: Pick<Declarations, "payer" | "feeBasis" | "rightOfReply"> & { priorWork: string }; contentHash: string; revokedReason: string | null;
+}
