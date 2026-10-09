@@ -37,7 +37,7 @@ export function StatementPanel({ runId, blockers, onChange }: { runId: string; b
 
   return (
     <section id="signoff" className="card stack anchor">
-      <div className="row spread"><div><strong>Sign-off</strong><p className="small muted" style={{ margin: "4px 0 0" }}>A named assessor prepares the statement and a different named reviewer countersigns it. Anyone with the code can then check it.</p></div></div>
+      <div className="row spread"><div><strong>Sign-off</strong><p className="small muted" style={{ margin: "4px 0 0" }}>A named assessor prepares the statement and a different named reviewer countersigns it. Anyone with the code can then check it. <a href="#/help?s=signoff">How does this work?</a></p></div></div>
 
       {issued && <IssuedCard s={issued} bare />}
       {issued && operate && (revoking ? (

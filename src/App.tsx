@@ -4,6 +4,7 @@ import { useRoute } from "./lib/router";
 import { useSession } from "./lib/session";
 import { Admin } from "./views/Admin";
 import { ChangePasswordView, LoginView, SetupView } from "./views/Auth";
+import { Help } from "./views/Help";
 import { Landing } from "./views/Landing";
 import { NewRun } from "./views/NewRun";
 import { RunDetail } from "./views/RunDetail";
@@ -26,6 +27,7 @@ export function App() {
   if (user.mustChange) view = <ChangePasswordView forced />;
   else if (p === "/account") view = <ChangePasswordView forced={false} />;
   else if (adm) view = user.role === "admin" ? <Admin tab={adm[1] ?? "users"} /> : <p className="muted">Administrators only.</p>;
+  else if (p === "/help") view = <Help route={route} />;
   else if (p === "/new") view = <NewRun />;
   else if (run) view = <RunDetail id={run[1]} route={route} key={run[1]} />;
   else view = <RunsList />;

@@ -32,6 +32,7 @@ export function Layout({ route, children }: { route: Route; children: ReactNode 
                   {canOperate(user) && link("/new", "New check", p === "/new")}
                   {user.role === "admin" && link("/admin", "Administration", p.startsWith("/admin"))}
                 </>}
+              {link("/help", "How it works", p === "/help")}
             </nav>
           )}
           <div className="row right">
