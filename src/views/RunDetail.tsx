@@ -30,7 +30,7 @@ export function RunDetail({ id, route }: { id: string; route: Route }) {
   const notes = useLoad(() => (staff ? api<NotesResponse>(`/api/runs/${id}/notes`) : Promise.resolve(null)), [id]);
   const [progress, setProgress] = useState<Progress | null>(null);
   const [running, setRunning] = useState(false), [driveError, setDriveError] = useState<unknown>(null);
-  const [keyTick, setKeyTick] = useState(0);
+  const [keyTick, setKeyTick] = useState(0), [pdfBusy, setPdfBusy] = useState(false);
   const stop = useRef(false), started = useRef(false);
 
   useEffect(() => { if (run.data) setProgress(run.data.progress); }, [run.data]);
@@ -81,12 +81,16 @@ export function RunDetail({ id, route }: { id: string; route: Route }) {
     ...(p.total === 0 ? ["There are no results to sign."] : []),
   ];
 
-  async function download(path: string, name: string, open: boolean) {
+  async function download(path: string, name: string) {
+    try { saveBlob(await apiBlob(path), name); } catch (e) { toast((e as Error).message, "error"); }
+  }
+  async function downloadPdf() {
+    setPdfBusy(true);
     try {
-      const blob = await apiBlob(path);
-      if (open) window.open(URL.createObjectURL(new Blob([await blob.text()], { type: "text/html" })), "_blank", "noopener");
-      else saveBlob(blob, name);
-    } catch (e) { toast((e as Error).message, "error"); }
+      const safeTool = (m.tool || "report").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
+      saveBlob(await apiBlob(`/api/runs/${id}/report?format=pdf`), `Assurance-report-${safeTool}-${new Date().toISOString().slice(0, 10)}.pdf`);
+      toast("PDF downloaded");
+    } catch (e) { toast((e as Error).message, "error"); } finally { setPdfBusy(false); }
   }
   async function remove() {
     if (!(await confirm({ title: "Delete this check?", body: "The run, its transcripts and the evidence are removed permanently.", confirmLabel: "Delete", danger: true }))) return;
@@ -108,9 +112,8 @@ export function RunDetail({ id, route }: { id: string; route: Route }) {
             <div className="row"><span className="pill">{MODE_LABEL[r.mode]}</span><span className="pill">{profileLabel(m.profile)}</span>{r.sector && <span className="pill">{SECTOR_LABEL[r.sector]}</span>}{r.departmentName && <span className="pill">{r.departmentName}</span>}{r.publishedAt && <span className="pill">Shared with client</span>}</div>
             {staff && <p className="small muted" style={{ margin: 0, maxWidth: "46em" }}>{r.evidenceSource}</p>}
             <div className="dl-actions" style={{ marginTop: 6 }}>
-              <button className="btn" onClick={() => void download(`/api/runs/${id}/report?format=html`, "report.html", true)}><Icon name="file" width={16} height={16} />Open report</button>
-              <button className="btn ghost" onClick={() => void download(`/api/runs/${id}/report?format=md`, "report.md", false)}><Icon name="download" width={16} height={16} />Markdown</button>
-              {staff && <button className="btn ghost" onClick={() => void download(`/api/runs/${id}/evidence.jsonl`, "evidence.jsonl", false)}>Evidence</button>}
+              <button className="btn" disabled={pdfBusy} onClick={() => void downloadPdf()}><Icon name="download" width={16} height={16} />{pdfBusy ? "Preparing PDF…" : "Download PDF report"}</button>
+              {staff && <button className="btn ghost" onClick={() => void download(`/api/runs/${id}/evidence.jsonl`, `evidence-${id.slice(0, 8)}.jsonl`)}>Evidence data</button>}
             </div>
           </div>
           <div style={{ textAlign: "center" }}>

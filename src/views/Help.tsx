@@ -114,7 +114,7 @@ export function Help({ route }: { route: Route }) {
         <>
           <Sec id="share" title="Sharing with the client and producing the report">
             <p>A check stays private until you <Term>publish</Term> it to the client's organisation. Their users then see the summary, results, findings and report, but never the raw transcripts or your review notes. <Term>Unpublish</Term> takes it back.</p>
-            <p>The report opens as a web page. To make a PDF, open it and use your browser's Print command, then Save as PDF. A Markdown version and the full evidence file (every transcript) are available to staff.</p>
+            <p>The report downloads as a PDF with a cover page, contents, page numbers and, once signed, a QR code that opens the public check page. Staff can also download the full evidence file (every transcript) as data.</p>
           </Sec>
 
           <Sec id="roles" title="Who can do what">
